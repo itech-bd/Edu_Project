@@ -47,14 +47,14 @@ class FrontendSetting extends Model
             'site_logo_path' => null,
             'site_favicon_path' => null,
             'footer_brand_tagline' => $isBangla
-                ? 'ট্রেনিং ইনস্টিটিউট • ক্যারিয়ার-ফোকাসড'
+                ? 'ট্রেনিং ইনস্টিটিউট • ক্যারিয়ার-ফোকাসড'
                 : 'Training Institute • Career-focused',
             'footer_brand_description' => $isBangla
-                ? 'ক্যারিয়ার-ফোকাসড টেক ও ক্রিয়েটিভ স্কিলের জন্য ট্রেনিং ইনস্টিটিউট। প্র্যাকটিক্যাল প্রজেক্ট, রিভিউ এবং নিয়মিত মেন্টর সাপোর্টের মাধ্যমে শিখুন।'
+                ? 'ক্যারিয়ার-ফোকাসড টেক ও ক্রিয়েটিভ স্কিলের জন্য ট্রেনিং ইনস্টিটিউট। প্র্যাকটিক্যাল প্রজেক্ট, রিভিউ এবং নিয়মিত মেন্টর সাপোর্টের মাধ্যমে শিখুন।'
                 : 'Training institute for career-focused tech & creative skills. Learn with practical projects, reviews, and ongoing mentor support.',
             'footer_updates_title' => $isBangla ? 'আপডেট পান' : 'Get updates',
             'footer_updates_subtitle' => $isBangla
-                ? 'ব্যাচ আপডেট ও ওয়ার্কশপ নিউজ পেতে আপনার ইমেইল দিন।'
+                ? 'ব্যাচ আপডেট ও ওয়ার্কশপ নিউজ পেতে আপনার ইমেইল দিন।'
                 : 'Drop your email to get batch updates and workshop news.',
             'footer_contact_title' => $isBangla ? 'যোগাযোগের তথ্য' : 'Contact Info',
             'footer_phone_label' => $isBangla ? 'ফোন' : 'Phone',

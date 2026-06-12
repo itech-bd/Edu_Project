@@ -1,53 +1,45 @@
 @extends('layouts.site')
 
-@section('title', ($newsUpdate->title ?? 'News') . ' • ' . config('app.name', 'iTechBD Ltd'))
+@section('title', $newsUpdate->title . ' • ' . config('app.name', 'iTechBD Ltd'))
 
 @section('content')
+@php
+    $imagePath = $newsUpdate->image_path ?? null;
+    $imageUrl = is_string($imagePath) && trim($imagePath) !== '' ? \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($imagePath, '/')) : null;
+@endphp
+
 <main>
-    <section class="border-b border-slate-200/70 dark:border-white/10">
-        <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
-            <div class="reveal">
-                <a href="{{ route('news') }}" class="text-sm font-semibold text-slate-600 hover:underline dark:text-slate-200">← Back to news</a>
+    <section class="bg-white py-12 lg:py-16">
+        <div class="brand-container max-w-5xl">
+            <a href="{{ route('news') }}" class="inline-flex text-sm font-extrabold text-[#292b86] hover:text-[#f15a24]">← Back to news</a>
+            <h1 class="mt-5 text-4xl font-black leading-tight text-slate-950 sm:text-5xl">{{ $newsUpdate->title }}</h1>
+            <div class="mt-4 text-sm font-bold uppercase tracking-[0.16em] text-[#f15a24]">{{ optional($newsUpdate->published_at ?: $newsUpdate->created_at)->format('d M Y') }}</div>
 
-                <h1 class="mt-4 text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl">{{ $newsUpdate->title }}</h1>
-
-                @php
-                    $dt = $newsUpdate->published_at ?: $newsUpdate->created_at;
-                @endphp
-                <div class="mt-3 text-sm text-slate-500 dark:text-slate-300">
-                    {{ $dt ? $dt->format('d M Y') : '' }}
-                </div>
-
-                @if (is_string($newsUpdate->excerpt) && trim($newsUpdate->excerpt) !== '')
-                    <p class="mt-5 text-base text-slate-700 dark:text-slate-200">{{ $newsUpdate->excerpt }}</p>
+            <div class="mt-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#292b86] to-[#f15a24]">
+                @if($imageUrl)
+                    <img src="{{ $imageUrl }}" alt="{{ $newsUpdate->title }}" class="max-h-[480px] w-full object-cover">
+                @else
+                    <div class="flex aspect-[16/7] items-center justify-center p-10 text-center text-3xl font-black text-white">iTechBD Update</div>
                 @endif
-
-                <article class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-                    {!! $newsUpdate->body !!}
-                </article>
             </div>
+
+            <article class="site-prose mt-8 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
+                {!! $newsUpdate->body !!}
+            </article>
         </div>
     </section>
+
+    @if($relatedNews->count())
+        <section class="py-12">
+            <div class="brand-container">
+                <x-site.section-title kicker="More Updates" title="Related announcements" />
+                <div class="mt-8 grid gap-6 md:grid-cols-3">
+                    @foreach($relatedNews as $news)
+                        <x-site.news-card :news="$news" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 </main>
 @endsection
-
-@push('scripts')
-<script>
-    (function () {
-        var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
-        if (!('IntersectionObserver' in window)) {
-            revealEls.forEach(function (el) { el.classList.add('is-visible'); });
-            return;
-        }
-        var observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -10% 0px' });
-        revealEls.forEach(function (el) { observer.observe(el); });
-    })();
-</script>
-@endpush

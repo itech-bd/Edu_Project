@@ -5,8 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'iTechBD Ltd') }}</title>
         @php
+            $frontendSettings = $frontendSettings ?? [];
             $faviconPath = $frontendSettings['site_favicon_path'] ?? null;
             $faviconUrl = $faviconPath ? asset('storage/' . ltrim((string) $faviconPath, '/')) : asset('favicon.ico');
         @endphp
@@ -14,13 +15,10 @@
         <link rel="shortcut icon" href="{{ $faviconUrl }}">
         <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
 
-        <!-- Scripts -->
         @php
             $manifestPath = public_path('build/manifest.json');
             $hotPath = public_path('hot');
@@ -77,82 +75,139 @@
 
         <style>
             [x-cloak] { display: none !important; }
+            html { color-scheme: light; }
+            body { background: #f8fafc; }
+            .itech-scrollbar::-webkit-scrollbar { width: 8px; }
+            .itech-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 999px; }
+            .dataTables_wrapper { color: #334155; }
+            .dataTables_wrapper .dataTables_filter input,
+            .dataTables_wrapper .dataTables_length select {
+                border: 1px solid #e2e8f0 !important;
+                border-radius: .75rem !important;
+                padding: .45rem .75rem !important;
+                margin-left: .5rem !important;
+                outline: none !important;
+            }
+            .dataTables_wrapper .dataTables_filter input:focus,
+            .dataTables_wrapper .dataTables_length select:focus {
+                border-color: #2E3192 !important;
+                box-shadow: 0 0 0 3px rgba(46,49,146,.12) !important;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                background: #2E3192 !important;
+                border-color: #2E3192 !important;
+                color: #fff !important;
+                border-radius: .7rem !important;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                background: #f1f5f9 !important;
+                border-color: #e2e8f0 !important;
+                color: #0f172a !important;
+                border-radius: .7rem !important;
+            }
+            table.dataTable.no-footer { border-bottom: 0 !important; }
+            table.dataTable thead th { border-bottom: 1px solid #e2e8f0 !important; }
         </style>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased text-slate-900">
         @php
             $panelLabel = 'Student Panel';
+            $panelTone = 'Learning Space';
             $user = auth()->user();
 
             if ($user && method_exists($user, 'hasRole')) {
                 if ($user->hasRole('admin')) {
                     $panelLabel = 'Admin Panel';
+                    $panelTone = 'Operations Center';
                 } elseif ($user->hasRole('mentor')) {
                     $panelLabel = 'Mentor Panel';
+                    $panelTone = 'Teaching Hub';
                 }
             }
+
+            $logoPath = $frontendSettings['site_logo_path'] ?? null;
+            $logoUrl = $logoPath ? asset('storage/' . ltrim((string) $logoPath, '/')) : asset('brand/itechbd-logo.png');
         @endphp
-        <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-slate-100">
-            <!-- Mobile sidebar -->
-            <div x-show="sidebarOpen" x-cloak style="display: none;" class="fixed inset-0 z-40 lg:hidden" aria-hidden="true">
-                <div class="absolute inset-0 z-40 bg-slate-900/60" @click="sidebarOpen = false"></div>
-                <div class="absolute inset-y-0 left-0 z-50 w-72 bg-slate-900 p-4 shadow-xl" @click.stop>
-                    <div class="flex items-center justify-between">
-                        <a href="/dashboard" class="flex items-center gap-2">
-                            <div class="h-9 w-9 rounded-lg bg-indigo-600/90 text-white grid place-items-center font-bold">{{ strtoupper(substr(config('app.name', 'A'), 0, 1)) }}</div>
-                            <div class="text-white">
-                                <div class="text-sm font-semibold leading-5">{{ config('app.name', 'Laravel') }}</div>
-                                <div class="text-xs text-slate-300">{{ $panelLabel }}</div>
-                            </div>
+
+        <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(46,49,146,.10),transparent_35%),radial-gradient(circle_at_top_right,rgba(244,123,32,.12),transparent_32%),#f8fafc]">
+            <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-50 lg:hidden" aria-hidden="true">
+                <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="sidebarOpen = false"></div>
+                <div class="absolute inset-y-0 left-0 w-[19rem] max-w-[85vw] overflow-y-auto bg-[#17194f] p-4 shadow-2xl itech-scrollbar" @click.stop>
+                    <div class="flex items-center justify-between rounded-2xl bg-white/10 p-3 ring-1 ring-white/10">
+                        <a href="/dashboard" class="flex min-w-0 items-center gap-3">
+                            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white p-1 shadow-sm">
+                                <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" class="max-h-9 max-w-full object-contain">
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block truncate text-sm font-extrabold text-white">{{ config('app.name', 'iTechBD Ltd') }}</span>
+                                <span class="block text-xs font-semibold text-white/65">{{ $panelLabel }}</span>
+                            </span>
                         </a>
-                        <button type="button" class="rounded-md p-2 text-slate-200 hover:bg-slate-800" @click="sidebarOpen = false" aria-label="Close sidebar">
-                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        <button type="button" class="grid h-9 w-9 place-items-center rounded-xl text-white hover:bg-white/10" @click="sidebarOpen = false" aria-label="Close sidebar">
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
-
-                    <div class="mt-6">
+                    <div class="mt-5">
                         @include('layouts.sidebar')
                     </div>
                 </div>
             </div>
 
             <div class="flex min-h-screen">
-                <!-- Desktop sidebar -->
-                <aside class="hidden lg:flex lg:w-72 lg:flex-col lg:bg-slate-900 lg:text-white lg:sticky lg:top-0 lg:h-screen lg:self-start">
-                    <div class="flex h-16 items-center gap-3 px-4 border-b border-slate-800">
-                        <div class="h-9 w-9 rounded-lg bg-indigo-600/90 text-white grid place-items-center font-bold">{{ strtoupper(substr(config('app.name', 'A'), 0, 1)) }}</div>
-                        <div class="min-w-0">
-                            <div class="text-sm font-semibold leading-5 truncate">{{ config('app.name', 'Laravel') }}</div>
-                            <div class="text-xs text-slate-300">{{ $panelLabel }}</div>
+                <aside class="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[19rem] lg:flex-col lg:self-start lg:bg-[#17194f] lg:text-white lg:shadow-2xl">
+                    <div class="border-b border-white/10 p-5">
+                        <a href="/dashboard" class="flex items-center gap-3 rounded-3xl bg-white p-3 shadow-sm">
+                            <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white">
+                                <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" class="max-h-10 max-w-full object-contain">
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block truncate text-sm font-extrabold text-[#2E3192]">{{ config('app.name', 'iTechBD Ltd') }}</span>
+                                <span class="mt-0.5 inline-flex rounded-full bg-[#F47B20]/10 px-2 py-0.5 text-[11px] font-bold text-[#C9570B]">{{ $panelLabel }}</span>
+                            </span>
+                        </a>
+                        <div class="mt-4 rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+                            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">{{ $panelTone }}</p>
+                            <p class="mt-1 text-sm font-semibold text-white">Welcome, {{ \Illuminate\Support\Str::limit(Auth::user()->name, 22) }}</p>
                         </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-4">
+                    <div class="flex-1 overflow-y-auto p-4 itech-scrollbar">
                         @include('layouts.sidebar')
+                    </div>
+                    <div class="border-t border-white/10 p-4">
+                        <a href="{{ route('home') }}" class="flex items-center justify-center gap-2 rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15">
+                            <i class="fa-solid fa-globe"></i>
+                            Visit Website
+                        </a>
                     </div>
                 </aside>
 
-                <!-- Main content -->
                 <div class="flex min-w-0 flex-1 flex-col">
-                    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
-                        <div class="flex h-16 items-center justify-between px-4 lg:px-6">
-                            <div class="flex items-center gap-3">
-                                <button type="button" class="lg:hidden rounded-md p-2 text-slate-600 hover:bg-slate-100" @click="sidebarOpen = true" aria-label="Open sidebar">
-                                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
+                    <header class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
+                        <div class="flex min-h-16 items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <button type="button" class="grid h-11 w-11 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 lg:hidden" @click="sidebarOpen = true" aria-label="Open sidebar">
+                                    <i class="fa-solid fa-bars"></i>
                                 </button>
-
-                                <div class="hidden sm:block text-sm text-slate-500">
-                                    {{ now()->format('l, d M Y') }}
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold uppercase tracking-[0.25em] text-[#2E3192]/70">{{ $panelLabel }}</p>
+                                    <p class="mt-1 truncate text-sm text-slate-500">{{ now()->format('l, d M Y') }}</p>
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-3">
-                                <x-dropdown align="right" width="48">
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <a href="{{ route('home') }}" class="hidden rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-[#2E3192]/30 hover:text-[#2E3192] sm:inline-flex">
+                                    <i class="fa-solid fa-house mr-2"></i> Home
+                                </a>
+                                <x-dropdown align="right" width="56">
                                     <x-slot name="trigger">
-                                        <button class="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
-                                            <span class="hidden sm:block">{{ Auth::user()->name }}</span>
+                                        <button class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-left shadow-sm transition hover:border-[#2E3192]/30 hover:shadow-md">
                                             <x-avatar :user="Auth::user()" />
+                                            <span class="hidden min-w-0 sm:block">
+                                                <span class="block max-w-40 truncate text-sm font-bold text-slate-900">{{ Auth::user()->name }}</span>
+                                                <span class="block max-w-40 truncate text-xs text-slate-500">{{ Auth::user()->email }}</span>
+                                            </span>
+                                            <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
                                         </button>
                                     </x-slot>
 
@@ -163,8 +218,7 @@
 
                                         <form method="POST" action="/logout">
                                             @csrf
-                                            <x-dropdown-link href="/logout"
-                                                onclick="event.preventDefault(); this.closest('form').submit();">
+                                            <x-dropdown-link href="/logout" onclick="event.preventDefault(); this.closest('form').submit();">
                                                 {{ __('Log Out') }}
                                             </x-dropdown-link>
                                         </form>
@@ -174,17 +228,13 @@
                         </div>
 
                         @isset($header)
-                            <div class="px-4 lg:px-6 py-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="min-w-0">
-                                        {{ $header }}
-                                    </div>
-                                </div>
+                            <div class="border-t border-slate-100 px-4 py-5 sm:px-6 lg:px-8">
+                                {{ $header }}
                             </div>
                         @endisset
                     </header>
 
-                    <main class="flex-1 px-4 lg:px-6 py-6">
+                    <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                         @php
                             $globalSuccess = session('success');
 
@@ -194,8 +244,20 @@
                         @endphp
 
                         @if ($globalSuccess)
-                            <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-100">
-                                {{ $globalSuccess }}
+                            <div class="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-sm">
+                                <i class="fa-solid fa-circle-check mt-0.5"></i>
+                                <span>{{ $globalSuccess }}</span>
+                            </div>
+                        @endif
+
+                        @if ($errors->any())
+                            <div class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 shadow-sm">
+                                <div class="font-bold">Please check the form again.</div>
+                                <ul class="mt-2 list-inside list-disc space-y-1">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         @endif
 

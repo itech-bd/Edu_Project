@@ -1,132 +1,109 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <h2 class="text-xl font-semibold text-slate-900 leading-tight">Invoice #INV-{{ $order->id }}</h2>
-                <p class="mt-1 text-sm text-slate-500">Created {{ optional($order->created_at)->format('d M Y, h:i A') }}</p>
+                <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#2E3192]/70">Invoice Details</p>
+                <h2 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">Invoice #INV-{{ $order->id }}</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Created {{ optional($order->created_at)->format('d M Y, h:i A') }}</p>
             </div>
 
             <div class="flex flex-wrap gap-2 print:hidden">
-                <a href="{{ url('/dashboard/student/invoices') }}" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Back</a>
-                <a href="{{ url('/dashboard/student/invoices/'.$order->getRouteKey().'/download') }}" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Download PDF</a>
-                <button type="button" onclick="window.print()" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Print</button>
+                <x-panel.action-link href="{{ url('/dashboard/student/invoices') }}" tone="secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </x-panel.action-link>
+                <x-panel.action-link href="{{ url('/dashboard/student/invoices/'.$order->getRouteKey().'/download') }}" tone="primary">
+                    <i class="fa-solid fa-download"></i> Download PDF
+                </x-panel.action-link>
+                <button type="button" onclick="window.print()" class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F47B20] px-4 py-2 text-sm font-bold text-white shadow-sm shadow-[#F47B20]/20 transition hover:bg-[#d96816]">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
             </div>
         </div>
     </x-slot>
 
     <style>
         @media print {
-            .print\:hidden {
-                display: none !important;
-            }
-
-            body {
-                background: white !important;
-            }
-        }
-
-        /* Hide global site background/watermark when viewing invoice */
-        div[class*="fixed inset-0 -z-10"] {
-            display: none !important;
+            .print\:hidden { display: none !important; }
+            body { background: white !important; }
+            header, aside { display: none !important; }
+            main { padding: 0 !important; }
         }
     </style>
 
-    <div class="mx-auto max-w-3xl">
-        <div class="rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-            <div class="border-b border-slate-200 p-6">
-                <div class="mb-6 flex items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                    @php
-                        $siteLogo = \App\Models\FrontendSetting::where('key', 'site_logo_path')->value('value_en');
-                    @endphp
-                    @if ($siteLogo)
-                        <img src="{{ asset('storage/' . $siteLogo) }}" alt="{{ config('app.name') }}" class="h-12 w-auto max-w-[200px] object-contain">
-                    @else
-                        <img src="{{ asset('brand/itechbd-logo.svg') }}" alt="iTechBD logo" class="h-12 w-auto">
-                    @endif
-                    <div class="text-right text-xs text-slate-500">System Generated Invoice</div>
-                </div>
-
-                <div class="flex flex-wrap items-start justify-between gap-6">
+    <div class="mx-auto max-w-4xl">
+        <div class="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200/70">
+            <div class="bg-gradient-to-br from-[#2E3192] via-[#20236f] to-[#151748] p-6 text-white sm:p-8">
+                <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <div class="text-sm font-semibold text-slate-500">Billed To</div>
-                        <div class="mt-1 text-base font-semibold text-slate-900">{{ $user->name }}</div>
-                        <div class="text-sm text-slate-600">{{ $user->email }}</div>
+                        @php
+                            $siteLogo = \App\Models\FrontendSetting::where('key', 'site_logo_path')->value('value_en');
+                        @endphp
+                        <div class="inline-flex rounded-2xl bg-white p-3 shadow-sm">
+                            @if ($siteLogo)
+                                <img src="{{ asset('storage/' . $siteLogo) }}" alt="{{ config('app.name') }}" class="h-12 w-auto max-w-[220px] object-contain">
+                            @else
+                                <img src="{{ asset('brand/itechbd-logo.png') }}" alt="iTechBD logo" class="h-12 w-auto">
+                            @endif
+                        </div>
+                        <h3 class="mt-6 text-3xl font-extrabold">Invoice #INV-{{ $order->id }}</h3>
+                        <p class="mt-2 text-sm text-white/70">System Generated Invoice</p>
                     </div>
 
-                    <div class="text-right">
-                        <div class="text-sm font-semibold text-slate-500">Status</div>
-                        @php
-                            $badge = match ($order->status) {
-                                'paid' => 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-                                'pending' => 'bg-amber-50 text-amber-700 ring-amber-200',
-                                'cancelled' => 'bg-rose-50 text-rose-700 ring-rose-200',
-                                default => 'bg-slate-50 text-slate-700 ring-slate-200',
-                            };
-                        @endphp
-                        <span class="mt-1 inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset {{ $badge }}">
-                            {{ ucfirst($order->status) }}
-                        </span>
+                    <div class="rounded-2xl bg-white/10 p-4 text-left ring-1 ring-white/15 sm:text-right">
+                        <div class="text-xs font-extrabold uppercase tracking-[0.18em] text-white/50">Status</div>
+                        <div class="mt-2"><x-panel.status-badge :status="$order->status" /></div>
+                        <div class="mt-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/50">Total Amount</div>
+                        <div class="mt-1 text-2xl font-extrabold">{{ $order->currency }} {{ number_format((float) $order->amount, 2) }}</div>
                     </div>
                 </div>
             </div>
 
-            <div class="p-6">
-                <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div class="rounded-lg bg-slate-50 p-4 ring-1 ring-inset ring-slate-200">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Course</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $order->course?->title ?? '—' }}</dd>
+            <div class="p-6 sm:p-8">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="rounded-3xl bg-slate-50 p-5 ring-1 ring-slate-100">
+                        <div class="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400">Billed To</div>
+                        <div class="mt-3 text-lg font-extrabold text-slate-950">{{ $user->name }}</div>
+                        <div class="mt-1 text-sm text-slate-500">{{ $user->email }}</div>
                     </div>
-
-                    <div class="rounded-lg bg-slate-50 p-4 ring-1 ring-inset ring-slate-200">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Batch</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $order->batch?->name ?? '—' }}</dd>
-                    </div>
-
-                    <div class="rounded-lg bg-slate-50 p-4 ring-1 ring-inset ring-slate-200">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Invoice Date</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ optional($order->created_at)->format('d M Y') }}</dd>
-                    </div>
-
-                    <div class="rounded-lg bg-slate-50 p-4 ring-1 ring-inset ring-slate-200">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Total</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $order->currency }} {{ number_format((float) $order->amount, 2) }}</dd>
-                    </div>
-                </dl>
-
-                <div class="mt-6">
-                    <div class="overflow-hidden rounded-xl ring-1 ring-slate-200">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-slate-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Description</th>
-                                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-slate-700">
-                                        Course enrollment{{ $order->course ? ': '.$order->course->title : '' }}
-                                        @if($order->batch)
-                                            <span class="text-slate-500">(Batch: {{ $order->batch->name }})</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">{{ $order->currency }} {{ number_format((float) $order->amount, 2) }}</td>
-                                </tr>
-                            </tbody>
-                            <tfoot class="bg-slate-50">
-                                <tr>
-                                    <td class="px-4 py-3 text-right text-sm font-semibold text-slate-700">Total</td>
-                                    <td class="px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $order->currency }} {{ number_format((float) $order->amount, 2) }}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                    <div class="rounded-3xl bg-slate-50 p-5 ring-1 ring-slate-100">
+                        <div class="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400">Invoice Date</div>
+                        <div class="mt-3 text-lg font-extrabold text-slate-950">{{ optional($order->created_at)->format('d M Y') }}</div>
+                        <div class="mt-1 text-sm text-slate-500">{{ optional($order->created_at)->format('h:i A') }}</div>
                     </div>
                 </div>
 
-                <div class="mt-6 text-xs text-slate-500">
-                    This invoice is generated by the system. If you have any issues, please contact support.
-                    <div class="mt-2 font-semibold text-slate-600">System Generated Invoice</div>
-                    <div class="mt-1 font-semibold text-slate-600">Signature Not Required</div>
+                <div class="mt-6 overflow-hidden rounded-3xl ring-1 ring-slate-200">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-5 py-4 text-left text-xs font-extrabold uppercase tracking-[0.18em] text-slate-500">Description</th>
+                                <th class="px-5 py-4 text-right text-xs font-extrabold uppercase tracking-[0.18em] text-slate-500">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            <tr>
+                                <td class="px-5 py-5">
+                                    <div class="font-extrabold text-slate-950">Course enrollment</div>
+                                    <div class="mt-1 text-sm text-slate-500">{{ $order->course?->title ?? '—' }}</div>
+                                    @if($order->batch)
+                                        <div class="mt-2 inline-flex rounded-full bg-[#2E3192]/10 px-3 py-1 text-xs font-extrabold text-[#2E3192]">Batch: {{ $order->batch->name }}</div>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-5 text-right text-base font-extrabold text-slate-950">{{ $order->currency }} {{ number_format((float) $order->amount, 2) }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-slate-50">
+                            <tr>
+                                <td class="px-5 py-4 text-right text-sm font-extrabold text-slate-700">Total</td>
+                                <td class="px-5 py-4 text-right text-lg font-extrabold text-[#2E3192]">{{ $order->currency }} {{ number_format((float) $order->amount, 2) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="mt-6 rounded-3xl bg-[#2E3192]/5 p-5 text-sm leading-6 text-slate-600 ring-1 ring-[#2E3192]/10">
+                    This invoice is generated by the system. If you have any payment issue, please contact iTechBD support.
+                    <div class="mt-3 font-extrabold text-slate-800">System Generated · Signature Not Required</div>
                 </div>
             </div>
         </div>

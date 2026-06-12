@@ -1,30 +1,6 @@
-import tinymce from 'tinymce/tinymce';
-
-import 'tinymce/icons/default';
-import 'tinymce/models/dom';
-import 'tinymce/themes/silver';
-
-import 'tinymce/plugins/advlist';
-import 'tinymce/plugins/autolink';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/charmap';
-import 'tinymce/plugins/anchor';
-import 'tinymce/plugins/searchreplace';
-import 'tinymce/plugins/visualblocks';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/fullscreen';
-import 'tinymce/plugins/insertdatetime';
-import 'tinymce/plugins/table';
-import 'tinymce/plugins/help';
-import 'tinymce/plugins/wordcount';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/autoresize';
-
-
-
 const SELECTOR = 'textarea.wysiwyg, textarea[data-editor="true"]';
 const FLAG = 'tinymceInitialized';
+let tinymceLoader = null;
 
 function getTinymceBaseUrl() {
     const meta = document.querySelector('meta[name="tinymce-base-url"]');
@@ -41,6 +17,40 @@ function getUploadUrl() {
     return meta?.getAttribute('content') ?? '';
 }
 
+function loadTinymce() {
+    if (window.tinymce) {
+        return Promise.resolve(window.tinymce);
+    }
+
+    if (tinymceLoader) {
+        return tinymceLoader;
+    }
+
+    tinymceLoader = new Promise((resolve, reject) => {
+        const baseUrl = getTinymceBaseUrl();
+        const script = document.createElement('script');
+        script.src = `${baseUrl}/tinymce.min.js`;
+        script.referrerPolicy = 'origin';
+
+        script.onload = () => {
+            if (window.tinymce) {
+                resolve(window.tinymce);
+                return;
+            }
+
+            reject(new Error('TinyMCE did not initialize.'));
+        };
+
+        script.onerror = () => reject(new Error('Failed to load TinyMCE assets.'));
+        document.head.appendChild(script);
+    }).catch((error) => {
+        tinymceLoader = null;
+        throw error;
+    });
+
+    return tinymceLoader;
+}
+
 async function initOneTextarea(textarea) {
     if (!textarea || textarea.dataset[FLAG] === '1') {
         return;
@@ -53,6 +63,7 @@ async function initOneTextarea(textarea) {
             textarea.id = `wysiwyg_${Math.random().toString(36).slice(2)}`;
         }
 
+        const tinymce = await loadTinymce();
         const uploadUrl = getUploadUrl();
         const csrfToken = getCsrfToken();
         const baseUrl = getTinymceBaseUrl();

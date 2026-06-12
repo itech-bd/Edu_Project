@@ -4,74 +4,119 @@ import './recaptcha-forms';
 
 import Alpine from 'alpinejs';
 
-const THEME_KEY = 'theme';
+function forceLightExperience() {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
 
-function normalizeTheme(value) {
-	return value === 'light' || value === 'dark' ? value : null;
+    try {
+        window.localStorage?.setItem('theme', 'light');
+    } catch (_) {
+        // Ignore storage errors.
+    }
 }
 
-function getForcedTheme() {
-	return normalizeTheme(document.documentElement?.dataset?.forceTheme);
-}
-
-function getInitialTheme() {
-	const forced = getForcedTheme();
-	if (forced) return forced;
-
-	const stored = normalizeTheme(window.localStorage?.getItem(THEME_KEY));
-	if (stored) return stored;
-
-	// Default to dark (site was designed dark-first)
-	return 'dark';
-}
-
-function applyTheme(theme) {
-	const resolved = normalizeTheme(theme) ?? 'dark';
-	const isDark = resolved === 'dark';
-
-	document.documentElement.classList.toggle('dark', isDark);
-	document.documentElement.dataset.theme = resolved;
-	document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-}
-
-function setTheme(theme) {
-	const forced = getForcedTheme();
-	if (forced) {
-		applyTheme(forced);
-		return;
-	}
-
-	const resolved = normalizeTheme(theme) ?? 'dark';
-	try {
-		window.localStorage?.setItem(THEME_KEY, resolved);
-	} catch (_) {
-		// ignore
-	}
-	applyTheme(resolved);
-}
-
-function toggleTheme() {
-	if (getForcedTheme()) return;
-
-	const current = normalizeTheme(document.documentElement.dataset.theme)
-		?? (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-	setTheme(current === 'dark' ? 'light' : 'dark');
-}
-
-// Apply theme ASAP (after bundle loads)
-applyTheme(getInitialTheme());
-
-// Delegate click handler so it works across all pages/layouts
-document.addEventListener('click', (event) => {
-	const button = event.target?.closest?.('[data-theme-toggle]');
-	if (!button) return;
-	event.preventDefault();
-	toggleTheme();
-});
-
-window.__setTheme = setTheme;
-window.__toggleTheme = toggleTheme;
+forceLightExperience();
 
 window.Alpine = Alpine;
+
+Alpine.data('batchRotator', (batches = []) => ({
+    batches: Array.isArray(batches) ? batches : [],
+    currentIndex: 0,
+    timerId: null,
+
+    get currentBatch() {
+        return this.batches[this.currentIndex] ?? null;
+    },
+
+    init() {
+        if (this.batches.length <= 1) {
+            return;
+        }
+
+        this.timerId = window.setInterval(() => {
+            this.currentIndex = (this.currentIndex + 1) % this.batches.length;
+        }, 3000);
+    },
+
+    destroy() {
+        if (this.timerId) {
+            window.clearInterval(this.timerId);
+            this.timerId = null;
+        }
+    },
+}));
+
+Alpine.data('courseCardRotator', (total = 0) => ({
+    total: Number.isFinite(Number(total)) ? Number(total) : 0,
+    currentIndex: 0,
+    timerId: null,
+    frameId: null,
+    resizeHandler: null,
+
+    init() {
+        this.$nextTick(() => {
+            this.syncHeight();
+        });
+
+        this.resizeHandler = () => this.syncHeight();
+        window.addEventListener('resize', this.resizeHandler);
+
+        if (this.total <= 1) {
+            return;
+        }
+
+        this.timerId = window.setInterval(() => {
+            this.currentIndex = (this.currentIndex + 1) % this.total;
+        }, 3000);
+    },
+
+    isActive(index) {
+        return this.currentIndex === index;
+    },
+
+    syncHeight() {
+        if (!this.$refs.cardsWrap) {
+            return;
+        }
+
+        if (this.frameId) {
+            window.cancelAnimationFrame(this.frameId);
+        }
+
+        this.frameId = window.requestAnimationFrame(() => {
+            const cards = this.$refs.cardsWrap.querySelectorAll('[data-hero-course-card]');
+            let maxHeight = 0;
+
+            cards.forEach((card) => {
+                const height = card.offsetHeight;
+                if (height > maxHeight) {
+                    maxHeight = height;
+                }
+            });
+
+            if (maxHeight > 0) {
+                this.$refs.cardsWrap.style.minHeight = `${maxHeight}px`;
+            }
+        });
+    },
+
+    destroy() {
+        if (this.timerId) {
+            window.clearInterval(this.timerId);
+            this.timerId = null;
+        }
+
+        if (this.frameId) {
+            window.cancelAnimationFrame(this.frameId);
+            this.frameId = null;
+        }
+
+        if (this.resizeHandler) {
+            window.removeEventListener('resize', this.resizeHandler);
+            this.resizeHandler = null;
+        }
+    },
+}));
 
 Alpine.start();

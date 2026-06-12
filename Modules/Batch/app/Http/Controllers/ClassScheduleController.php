@@ -99,7 +99,11 @@ class ClassScheduleController extends Controller implements HasMiddleware
                 ->first();
         }
 
-        return view('batch::schedules.index', compact('batch', 'nextSchedule'));
+        $schedules = $batch->classSchedules()
+            ->orderBy('class_date')
+            ->get();
+
+        return view('batch::schedules.index', compact('batch', 'nextSchedule', 'schedules'));
     }
 
     /**

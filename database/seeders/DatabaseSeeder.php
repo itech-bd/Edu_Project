@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\FrontendPage;
+use App\Models\FrontendSection;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\BatchAssignmentsAndSchedulesSeeder;
@@ -12,8 +14,14 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SampleBatchesSeeder;
 use Database\Seeders\SampleCoursesSeeder;
 use Database\Seeders\SampleReviewsSeeder;
+use Database\Seeders\SuperAdminSeeder;
 use Database\Seeders\StudentsSeeder;
+use Database\Seeders\DemoStudentSeeder;
 use Database\Seeders\FrontendContentSeeder;
+use Modules\Batch\Models\Batch;
+use Modules\Course\Models\Course;
+use Modules\Mentors\Models\Mentor;
+use Modules\Reviews\Models\Review;
 
 /**
  * Seeds the application with demo/initial data.
@@ -38,14 +46,39 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call(RolesAndPermissionsSeeder::class);
-        $this->call(MentorsSeeder::class);
-        $this->call(StudentsSeeder::class);
-        $this->call(SampleCoursesSeeder::class);
-        $this->call(SampleReviewsSeeder::class);
-        $this->call(SampleBatchesSeeder::class);
-        $this->call(BatchAssignmentsAndSchedulesSeeder::class);
-        $this->call(FrontendContentSeeder::class);
-        $this->call(FrontendSettingsSeeder::class);
+        $this->call(SuperAdminSeeder::class);
+        $this->call(DemoStudentSeeder::class);
+
+        // Demo/sample content is intentionally opt-in so importing a real SQL dump
+        // is not overwritten by a later `db:seed`.
+        if ((bool) env('DEMO_CONTENT_SEED', false)) {
+            if (Mentor::query()->count() === 0) {
+                $this->call(MentorsSeeder::class);
+            }
+
+            if (User::query()->role('student')->count() === 0) {
+                $this->call(StudentsSeeder::class);
+            }
+
+            if (Course::query()->count() === 0) {
+                $this->call(SampleCoursesSeeder::class);
+            }
+
+            if (Review::query()->count() === 0) {
+                $this->call(SampleReviewsSeeder::class);
+            }
+
+            if (Batch::query()->count() === 0) {
+                $this->call(SampleBatchesSeeder::class);
+                $this->call(BatchAssignmentsAndSchedulesSeeder::class);
+            }
+
+            if (FrontendPage::query()->count() === 0 && FrontendSection::query()->count() === 0) {
+                $this->call(FrontendContentSeeder::class);
+            }
+
+            $this->call(FrontendSettingsSeeder::class);
+        }
 
         User::query()->firstOrCreate(
             ['email' => 'test@example.com'],

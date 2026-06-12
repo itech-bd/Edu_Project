@@ -13,4 +13,27 @@ export default defineConfig({
             ],
         }),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (!id.includes('node_modules')) {
+                        return;
+                    }
+
+                    if (id.includes('@fortawesome/fontawesome-free')) {
+                        return 'fontawesome';
+                    }
+
+                    if (id.includes('alpinejs')) {
+                        return 'alpine';
+                    }
+
+                    if (id.includes('axios')) {
+                        return 'axios';
+                    }
+                },
+            },
+        },
+    },
 });

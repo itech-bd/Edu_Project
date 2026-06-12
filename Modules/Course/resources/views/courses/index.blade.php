@@ -1,49 +1,49 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <h2 class="text-xl font-semibold text-slate-900 leading-tight">Courses</h2>
-                <p class="mt-1 text-sm text-slate-500">Create and manage courses.</p>
+                <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#2E3192]/70">Admin · Course Management</p>
+                <h2 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">Courses</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Create, update and monitor all professional skill courses.</p>
             </div>
 
             @can('addCourse')
-                <a href="/dashboard/courses/create" class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                <x-panel.action-link href="{{ url('/dashboard/courses/create') }}" tone="orange">
+                    <i class="fa-solid fa-plus"></i>
                     Add Course
-                </a>
+                </x-panel.action-link>
             @endcan
         </div>
     </x-slot>
 
     @push('styles')
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
-        <style>
-            .dataTables_wrapper .dataTables_length select {
-                padding-right: 2.0rem !important;
-                padding-left: 0.75rem !important;
-                background-position: right 0.5rem center !important;
-                background-repeat: no-repeat !important;
-            }
-        </style>
     @endpush
 
-    @if (session('success'))
-        <div class="mb-4 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800 ring-1 ring-emerald-100">{{ session('success') }}</div>
-    @endif
-
-    <div class="rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-        <div class="overflow-x-auto p-4">
-            <table id="courses-table" class="min-w-full divide-y divide-slate-200">
+    <div class="rounded-[2rem] bg-white p-5 shadow-sm ring-1 ring-slate-200/70">
+        <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-950">Course List</h3>
+                <p class="mt-1 text-sm text-slate-500">Search, filter and manage course records.</p>
+            </div>
+            <div class="inline-flex items-center gap-2 rounded-2xl bg-[#2E3192]/10 px-3 py-2 text-sm font-bold text-[#2E3192]">
+                <i class="fa-solid fa-database"></i>
+                Dynamic DataTable
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table id="courses-table" class="min-w-full divide-y divide-slate-200 overflow-hidden rounded-2xl">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">SL</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Title</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Fee</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Batches</th>
-                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">SL</th>
+                        <th class="px-4 py-3 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">Title</th>
+                        <th class="px-4 py-3 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">Fee</th>
+                        <th class="px-4 py-3 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">Batches</th>
+                        <th class="px-4 py-3 text-right text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200 bg-white"></tbody>
+                <tbody class="divide-y divide-slate-100 bg-white"></tbody>
             </table>
         </div>
     </div>
@@ -66,6 +66,11 @@
                         { data: 'actions', name: 'actions', orderable: false, searchable: false },
                     ],
                     order: [[1, 'asc']],
+                    pageLength: 10,
+                    language: {
+                        search: 'Search courses:',
+                        lengthMenu: 'Show _MENU_ courses',
+                    }
                 });
             });
         </script>
