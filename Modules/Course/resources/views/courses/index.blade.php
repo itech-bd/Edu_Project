@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#2E3192]/70">Admin · Course Management</p>
+                <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#2E3192]/70">Admin &middot; Course Management</p>
                 <h2 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">Courses</h2>
                 <p class="mt-2 text-sm leading-6 text-slate-500">Create, update and monitor all professional skill courses.</p>
             </div>

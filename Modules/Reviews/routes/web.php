@@ -8,8 +8,7 @@ $adminReviewRoutes = static function (): void {
 };
 
 $dashboardRoutes = static function () use ($adminReviewRoutes): void {
-    $adminGroup = Route::middleware(['role:admin']);
-    $adminGroup->group($adminReviewRoutes);
+    $adminReviewRoutes();
 };
 
 $webRoutes = static function () use ($dashboardRoutes): void {

@@ -3,6 +3,7 @@
 namespace Modules\Course\Models;
 
 use App\Models\User;
+use App\Support\TextEncoding;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +48,11 @@ class Course extends Model
     protected static function booted(): void
     {
         static::saving(function (Course $course): void {
+            $course->title = TextEncoding::repairMojibake($course->title) ?? $course->title;
+            $course->description = TextEncoding::repairMojibake($course->description) ?? $course->description;
+            $course->slug = TextEncoding::repairMojibake($course->slug) ?? $course->slug;
+            $course->thumbnail = TextEncoding::repairMojibake($course->thumbnail) ?? $course->thumbnail;
+
             $currentSlug = is_string($course->slug) ? trim($course->slug) : '';
 
             if ($currentSlug === '') {

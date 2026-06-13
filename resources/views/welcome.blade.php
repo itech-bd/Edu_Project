@@ -43,10 +43,10 @@
                     Admissions going on
                 </div>
 
-                <h1 class="mt-6 text-4xl font-black leading-[1.05] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                <h2 class="mt-6 text-3xl font-black leading-[1.05] tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
                     {{ $heroTitle }}
                     <span class="block text-[#f15a24]">{{ $heroHighlight }}</span>
-                </h1>
+                </h2>
 
                 <div class="mt-5 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg site-prose">
                     {!! $heroText !!}
@@ -54,7 +54,7 @@
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                     <a href="{{ $heroButtonLink }}" class="inline-flex items-center justify-center rounded-full bg-[#f15a24] px-7 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#f15a24]/25 transition hover:-translate-y-0.5 hover:bg-[#ed1c24]">
-                        {{ $heroButtonText }} <span class="ml-2">→</span>
+                        {{ $heroButtonText }} <span class="ml-2">&rarr;</span>
                     </a>
                     <a href="{{ url('/contact') }}" class="inline-flex items-center justify-center rounded-full border border-[#292b86]/15 bg-white px-7 py-3.5 text-sm font-extrabold text-[#292b86] transition hover:-translate-y-0.5 hover:bg-[#292b86] hover:text-white">
                         Free Consultation
@@ -135,7 +135,7 @@
                             </div>
                             <h3 class="mt-5 text-lg font-black text-slate-950">{{ $trackName }}</h3>
                             <p class="mt-2 text-sm leading-6 text-slate-600">{{ $trackCourses->count() }} active {{ \Illuminate\Support\Str::plural('course', $trackCourses->count()) }}</p>
-                            <div class="mt-5 text-sm font-extrabold text-[#292b86] group-hover:text-[#f15a24]">Browse track →</div>
+                            <div class="mt-5 text-sm font-extrabold text-[#292b86] group-hover:text-[#f15a24]">Browse track &rarr;</div>
                         </a>
                     @endforeach
                 </div>
@@ -244,6 +244,19 @@
         </section>
     @endif
 
+    @if($latestNews->count())
+        <section class="py-14">
+            <div class="brand-container">
+                <x-site.section-title kicker="News & Updates" title="Latest announcements" subtitle="Published news from the database appears automatically." :action-url="route('news')" action-label="All news" />
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
+                    @foreach($latestNews as $news)
+                        <x-site.news-card :news="$news" class="reveal" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
     @if($reviews->count())
         <section class="bg-white py-14">
             <div class="brand-container">
@@ -254,23 +267,10 @@
                             <div class="flex gap-1 text-[#f15a24]">
                                 @for($i = 1; $i <= (int) $review->rating; $i++) <i class="fa-solid fa-star"></i> @endfor
                             </div>
-                            <p class="mt-4 text-sm leading-7 text-slate-600">“{{ $review->quote }}”</p>
+                            <p class="mt-4 text-sm leading-7 text-slate-600">&ldquo;{{ $review->quote }}&rdquo;</p>
                             <div class="mt-5 font-black text-slate-950">{{ $review->name }}</div>
                             @if($review->designation)<div class="text-sm text-slate-500">{{ $review->designation }}</div>@endif
                         </article>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
-
-    @if($latestNews->count())
-        <section class="py-14">
-            <div class="brand-container">
-                <x-site.section-title kicker="News & Updates" title="Latest announcements" subtitle="Published news from the database appears automatically." :action-url="route('news')" action-label="All news" />
-                <div class="mt-10 grid gap-6 md:grid-cols-3">
-                    @foreach($latestNews as $news)
-                        <x-site.news-card :news="$news" class="reveal" />
                     @endforeach
                 </div>
             </div>

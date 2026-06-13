@@ -87,6 +87,18 @@ Route::middleware('frontend.locale')->group(
             ->defaults('slug', 'reviews')
             ->name('reviews');
 
+        Route::get('/solutions/software-solutions', [SiteController::class, 'page'])
+            ->defaults('slug', 'software-solutions')
+            ->name('solutions.software');
+
+        Route::get('/solutions/it-solutions', [SiteController::class, 'page'])
+            ->defaults('slug', 'it-solutions')
+            ->name('solutions.it');
+
+        Route::get('/solutions/web-hosting-solutions', [SiteController::class, 'page'])
+            ->defaults('slug', 'web-hosting-solutions')
+            ->name('solutions.hosting');
+
         Route::get('/news', [SiteController::class, 'news'])->name('news');
         Route::get('/news/data', [SiteController::class, 'newsData'])->name('news.data');
         Route::get('/news/{newsUpdate}', [SiteController::class, 'newsShow'])->name('news.show');
@@ -276,4 +288,3 @@ Route::middleware(['auth', 'verified', 'role:admin', 'backend.locale'])
             )->name('wysiwyg.upload');
         }
     );
-

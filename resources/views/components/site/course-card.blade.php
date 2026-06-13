@@ -97,7 +97,7 @@
 
         <div class="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
             <a href="{{ route('courses.show', $course) }}" class="inline-flex items-center gap-2 text-sm font-extrabold text-[#292b86] transition group-hover:text-[#f15a24]">
-                View details <span aria-hidden="true">→</span>
+                View details <span aria-hidden="true">&rarr;</span>
             </a>
 
             @auth

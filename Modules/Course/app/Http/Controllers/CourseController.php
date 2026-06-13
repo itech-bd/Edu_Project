@@ -3,9 +3,9 @@
 namespace Modules\Course\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -49,32 +49,32 @@ class CourseController extends Controller implements HasMiddleware
             return DataTables::eloquent($query)
                 ->addIndexColumn()
                 ->addColumn('fee', function (Course $course) {
-                    $hasOnlineOffline = !is_null($course->online_old_price)
-                        || !is_null($course->online_discount_price)
-                        || !is_null($course->offline_old_price)
-                        || !is_null($course->offline_discount_price);
+                    $hasOnlineOffline = ! is_null($course->online_old_price)
+                        || ! is_null($course->online_discount_price)
+                        || ! is_null($course->offline_old_price)
+                        || ! is_null($course->offline_discount_price);
 
                     if ($hasOnlineOffline) {
                         $onlinePrice  = $course->online_discount_price ?? $course->online_old_price;
                         $offlinePrice = $course->offline_discount_price ?? $course->offline_old_price;
 
                         $parts = [];
-                        if (!is_null($onlinePrice)) {
+                        if (! is_null($onlinePrice)) {
                             $parts[] = '<span class="text-sky-700">Online: ' . e(number_format((float) $onlinePrice, 2)) . '</span>';
                         }
-                        if (!is_null($offlinePrice)) {
+                        if (! is_null($offlinePrice)) {
                             $parts[] = '<span class="text-amber-700">Offline: ' . e(number_format((float) $offlinePrice, 2)) . '</span>';
                         }
                         if (count($parts)) {
-                            return '<div class="text-sm space-x-2">' . implode('<span class="text-slate-300"> • </span>', $parts) . '</div>';
+                            return '<div class="text-sm space-x-2">' . implode('<span class="text-slate-300"> &bull; </span>', $parts) . '</div>';
                         }
                     }
 
                     $oldPrice = $course->old_price;
                     $discountPrice = $course->discount_price;
 
-                    $hasDiscount = !is_null($oldPrice)
-                        && !is_null($discountPrice)
+                    $hasDiscount = ! is_null($oldPrice)
+                        && ! is_null($discountPrice)
                         && (float) $discountPrice < (float) $oldPrice;
 
                     if ($hasDiscount) {
@@ -83,22 +83,22 @@ class CourseController extends Controller implements HasMiddleware
 
                         return '<div class="text-sm">'
                             . '<span class="font-semibold text-slate-500 line-through">' . $old . '</span>'
-                            . '<span class="mx-2 text-slate-300">•</span>'
+                            . '<span class="mx-2 text-slate-300">&bull;</span>'
                             . '<span class="font-semibold text-emerald-700">' . $discount . '</span>'
                             . '</div>';
                     }
 
-                    if (!is_null($discountPrice)) {
+                    if (! is_null($discountPrice)) {
                         $discount = e(number_format((float) $discountPrice, 2));
                         return '<div class="text-sm font-semibold text-emerald-700">' . $discount . '</div>';
                     }
 
-                    if (!is_null($oldPrice)) {
+                    if (! is_null($oldPrice)) {
                         $old = e(number_format((float) $oldPrice, 2));
                         return '<div class="text-sm font-semibold text-slate-900">' . $old . '</div>';
                     }
 
-                    return '<span class="text-sm text-slate-500">—</span>';
+                    return '<span class="text-sm text-slate-500">&mdash;</span>';
                 })
                 ->addColumn('status_badge', function (Course $course) {
                     if ($course->status === 'active') {
@@ -271,7 +271,7 @@ class CourseController extends Controller implements HasMiddleware
     private function deleteCourseThumbnailIfStored(Course $course): void
     {
         $thumb = $course->thumbnail;
-        if (!is_string($thumb)) {
+        if (! is_string($thumb)) {
             return;
         }
 

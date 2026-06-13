@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\TextEncoding;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
@@ -138,3 +139,45 @@ Artisan::command('user:verify-email {user : User id or email} {--force : Re-veri
     $this->line('email_verified_at=' . (string) ($user->email_verified_at ?? ''));
     return 0;
 })->purpose('Mark a user email as verified (sets email_verified_at).');
+
+Artisan::command('courses:repair-text-encoding {--dry-run : Show what would change without saving}', function () {
+    if (! Schema::hasTable('courses')) {
+        $this->error('Table "courses" does not exist. Run: php artisan migrate');
+        return 1;
+    }
+
+    $updated = 0;
+    $dryRun = (bool) $this->option('dry-run');
+
+    Course::query()->orderBy('id')->chunkById(100, function ($courses) use (&$updated, $dryRun) {
+        foreach ($courses as $course) {
+            $changes = [];
+
+            foreach (['title', 'description', 'slug', 'thumbnail'] as $field) {
+                $original = $course->{$field};
+                $repaired = TextEncoding::repairMojibake($original);
+
+                if ($repaired !== $original) {
+                    $changes[$field] = $repaired;
+                }
+            }
+
+            if ($changes === []) {
+                continue;
+            }
+
+            $updated++;
+            $this->line("- [repair] #{$course->id} {$course->title}");
+
+            if (! $dryRun) {
+                $course->forceFill($changes)->save();
+            }
+        }
+    });
+
+    $this->info($dryRun
+        ? "Dry run complete. {$updated} course(s) need repair."
+        : "Repair complete. Updated {$updated} course(s).");
+
+    return 0;
+})->purpose('Repair mojibake/encoding issues in course text fields.');

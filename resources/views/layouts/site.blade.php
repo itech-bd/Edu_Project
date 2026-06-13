@@ -167,6 +167,16 @@
             ['label' => __('frontend.home'), 'url' => route('home'), 'active' => request()->routeIs('home')],
             ['label' => __('frontend.about'), 'url' => route('about'), 'active' => request()->routeIs('about')],
             ['label' => __('frontend.courses'), 'url' => route('courses'), 'active' => request()->routeIs('courses*') || request()->routeIs('checkout.*')],
+            [
+                'label' => 'Solutions',
+                'url' => route('solutions.software'),
+                'active' => request()->routeIs('solutions.*'),
+                'children' => [
+                    ['label' => 'Software Solutions', 'url' => route('solutions.software'), 'active' => request()->routeIs('solutions.software')],
+                    ['label' => 'IT Solutions', 'url' => route('solutions.it'), 'active' => request()->routeIs('solutions.it')],
+                    ['label' => 'Web Hosting Solutions', 'url' => route('solutions.hosting'), 'active' => request()->routeIs('solutions.hosting')],
+                ],
+            ],
             ['label' => __('frontend.mentors'), 'url' => route('mentors'), 'active' => request()->routeIs('mentors*')],
             ['label' => __('frontend.reviews'), 'url' => route('reviews'), 'active' => request()->routeIs('reviews')],
             ['label' => __('frontend.news'), 'url' => route('news'), 'active' => request()->routeIs('news*')],
@@ -204,9 +214,27 @@
 
             <nav class="hidden items-center gap-1 lg:flex">
                 @foreach($navItems as $item)
-                    <a href="{{ $item['url'] }}" class="rounded-full px-4 py-2 text-sm font-bold transition {{ $item['active'] ? 'bg-[#292b86] text-white shadow-lg shadow-[#292b86]/20' : 'text-slate-700 hover:bg-[#292b86]/5 hover:text-[#292b86]' }}">
-                        {{ $item['label'] }}
-                    </a>
+                    @if(!empty($item['children']))
+                        <div class="group relative">
+                            <a href="{{ $item['url'] }}" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition {{ $item['active'] ? 'bg-[#292b86] text-white shadow-lg shadow-[#292b86]/20' : 'text-slate-700 hover:bg-[#292b86]/5 hover:text-[#292b86]' }}">
+                                {{ $item['label'] }}
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </a>
+                            <div class="invisible absolute left-0 top-full z-20 w-64 pt-3 opacity-0 transition duration-200 group-hover:visible group-hover:opacity-100">
+                                <div class="translate-y-2 rounded-[1.4rem] border border-slate-200 bg-white p-2 shadow-2xl shadow-[#292b86]/10 transition duration-200 group-hover:translate-y-0">
+                                @foreach($item['children'] as $child)
+                                    <a href="{{ $child['url'] }}" class="block rounded-2xl px-4 py-3 text-sm font-bold transition {{ $child['active'] ? 'bg-[#292b86] text-white' : 'text-slate-700 hover:bg-[#292b86]/5 hover:text-[#292b86]' }}">
+                                        {{ $child['label'] }}
+                                    </a>
+                                @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ $item['url'] }}" class="rounded-full px-4 py-2 text-sm font-bold transition {{ $item['active'] ? 'bg-[#292b86] text-white shadow-lg shadow-[#292b86]/20' : 'text-slate-700 hover:bg-[#292b86]/5 hover:text-[#292b86]' }}">
+                            {{ $item['label'] }}
+                        </a>
+                    @endif
                 @endforeach
             </nav>
 
@@ -233,7 +261,23 @@
         <div id="siteMobileMenu" class="hidden border-t border-slate-100 bg-white lg:hidden">
             <div class="brand-container grid gap-2 py-4">
                 @foreach($navItems as $item)
-                    <a href="{{ $item['url'] }}" class="rounded-2xl px-4 py-3 text-sm font-bold {{ $item['active'] ? 'bg-[#292b86] text-white' : 'bg-slate-50 text-slate-700' }}">{{ $item['label'] }}</a>
+                    @if(!empty($item['children']))
+                        <div class="rounded-2xl {{ $item['active'] ? 'bg-[#292b86]/5' : 'bg-slate-50' }} p-2">
+                            <a href="{{ $item['url'] }}" class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold {{ $item['active'] ? 'bg-[#292b86] text-white' : 'text-slate-700' }}">
+                                <span>{{ $item['label'] }}</span>
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </a>
+                            <div class="mt-2 grid gap-2 pl-3">
+                                @foreach($item['children'] as $child)
+                                    <a href="{{ $child['url'] }}" class="rounded-2xl px-4 py-3 text-sm font-bold {{ $child['active'] ? 'bg-[#292b86] text-white' : 'bg-white text-slate-700' }}">
+                                        {{ $child['label'] }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ $item['url'] }}" class="rounded-2xl px-4 py-3 text-sm font-bold {{ $item['active'] ? 'bg-[#292b86] text-white' : 'bg-slate-50 text-slate-700' }}">{{ $item['label'] }}</a>
+                    @endif
                 @endforeach
 
                 <div class="mt-2 grid grid-cols-2 gap-2">
