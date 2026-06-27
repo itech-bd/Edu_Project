@@ -186,6 +186,32 @@
         $footerFacebookUrl = $frontendSettings['footer_facebook_url'] ?? '#';
         $footerLinkedinUrl = $frontendSettings['footer_linkedin_url'] ?? '#';
         $footerYoutubeUrl = $frontendSettings['footer_youtube_url'] ?? '#';
+        $footerBrandTagline = $frontendSettings['footer_brand_tagline'] ?? 'Training Institute';
+        $footerBrandDescription = $frontendSettings['footer_brand_description'] ?? 'Develop software and professional skills with practical training, mentor support, and career-focused courses.';
+        $footerContactTitle = $frontendSettings['footer_contact_title'] ?? 'Get in Touch';
+        $footerPhoneLabel = $frontendSettings['footer_phone_label'] ?? 'Phone';
+        $footerEmailLabel = $frontendSettings['footer_email_label'] ?? 'Email';
+        $footerLocationLabel = $frontendSettings['footer_location_label'] ?? 'Address';
+        $footerUsefulLinks = [
+            ['label' => 'Course', 'url' => route('courses')],
+            ['label' => 'Workshop', 'url' => route('courses')],
+            ['label' => 'Event', 'url' => route('news')],
+            ['label' => 'Archive', 'url' => route('news')],
+            ['label' => 'Team', 'url' => route('mentors')],
+            ['label' => 'About Us', 'url' => route('about')],
+            ['label' => 'Our Vision & Mission', 'url' => route('about')],
+            ['label' => 'Trainer', 'url' => route('mentors')],
+            ['label' => 'Student Review', 'url' => route('reviews')],
+            ['label' => 'Career', 'url' => route('about')],
+            ['label' => 'FAQ', 'url' => url('/contact')],
+            ['label' => 'Privacy & Policy', 'url' => route('privacy')],
+            ['label' => 'Terms & Conditions', 'url' => route('terms')],
+        ];
+        $footerAccreditations = [
+            ['title' => 'Accredited By', 'value' => config('app.name', 'iTechBD Ltd')],
+            ['title' => 'A Concern Of', 'value' => 'bitBirds Solutions'],
+            ['title' => 'Member Of', 'value' => 'BASIS Member'],
+        ];
     @endphp
 
     <div class="fixed inset-0 -z-10 brand-grid bg-[#fbfbff]"></div>
@@ -294,7 +320,91 @@
 
     @yield('content')
 
-    <footer class="mt-16 bg-[#2d211d] text-white">
+    <footer class="mt-16 border-t border-slate-200 bg-white text-slate-900">
+        <div class="brand-container py-14 lg:py-16">
+            <div class="grid gap-12 lg:grid-cols-[1.05fr_1.35fr_.95fr] lg:items-start">
+                <div>
+                    <div class="flex items-center gap-4">
+                        <img src="{{ $logoUrl }}" alt="{{ config('app.name', 'iTechBD Ltd') }}" class="h-16 w-auto object-contain">
+                    </div>
+
+                    <p class="mt-6 max-w-md text-base leading-9 text-slate-700">
+                        {{ $footerBrandDescription }}
+                    </p>
+
+                    <div class="mt-7 flex flex-wrap gap-3">
+                        <a href="{{ $footerFacebookUrl ?: '#' }}" target="_blank" rel="noopener noreferrer" class="grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-slate-900 transition hover:border-[#f15a24] hover:bg-[#f15a24] hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="{{ $footerLinkedinUrl ?: '#' }}" target="_blank" rel="noopener noreferrer" class="grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-slate-900 transition hover:border-[#f15a24] hover:bg-[#f15a24] hover:text-white" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="{{ $footerYoutubeUrl ?: '#' }}" target="_blank" rel="noopener noreferrer" class="grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-slate-900 transition hover:border-[#f15a24] hover:bg-[#f15a24] hover:text-white" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-[2rem] font-black uppercase tracking-tight text-slate-950">Useful Links</h3>
+                    <div class="mt-5 h-2 w-full max-w-[33rem] bg-[#ffbf1f]"></div>
+
+                    <div class="mt-7 grid gap-x-8 gap-y-4 text-lg text-slate-800 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach($footerUsefulLinks as $link)
+                            <a href="{{ $link['url'] }}" class="transition hover:text-[#f15a24]">{{ $link['label'] }}</a>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-10 rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(41,43,134,.03),rgba(241,90,36,.05))] px-5 py-6">
+                        <div class="grid gap-5 sm:grid-cols-3">
+                            @foreach($footerAccreditations as $item)
+                                <div class="text-center sm:text-left">
+                                    <div class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{{ $item['title'] }}</div>
+                                    <div class="mt-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-extrabold text-slate-900 shadow-sm">
+                                        {{ $item['value'] }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-[2rem] font-black uppercase tracking-tight text-slate-950">{{ $footerContactTitle }}</h3>
+
+                    <div class="mt-6 grid gap-5 text-lg leading-8 text-slate-800">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot mt-2 text-[#292b86]"></i>
+                            <div>
+                                <div class="font-black text-slate-950">{{ $footerLocationLabel }}:</div>
+                                <div>{{ $siteAddress }}</div>
+                            </div>
+                        </div>
+
+                        <a href="{{ $sitePhoneTel }}" class="flex items-start gap-3 transition hover:text-[#f15a24]">
+                            <i class="fa-solid fa-phone mt-2 text-[#292b86]"></i>
+                            <div>
+                                <div class="font-black text-slate-950">{{ $footerPhoneLabel }}:</div>
+                                <div>{{ $sitePhone }}</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ $siteEmailMailto }}" class="flex items-start gap-3 transition hover:text-[#f15a24]">
+                            <i class="fa-solid fa-envelope mt-2 text-[#292b86]"></i>
+                            <div>
+                                <div class="font-black text-slate-950">{{ $footerEmailLabel }}:</div>
+                                <div>{{ $siteEmail }}</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+                <p>&copy; {{ date('Y') }} {{ config('app.name', 'iTechBD Ltd') }}. {{ $frontendSettings['footer_copyright'] ?? 'All rights reserved.' }}</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="{{ route('privacy') }}" class="transition hover:text-[#f15a24]">Privacy</a>
+                    <a href="{{ route('terms') }}" class="transition hover:text-[#f15a24]">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <footer class="hidden mt-16 bg-[#2d211d] text-white">
         <div class="brand-container py-12 lg:py-16">
             <div class="grid gap-10 lg:grid-cols-[1.25fr_.8fr_.8fr_1fr]">
                 <div>
